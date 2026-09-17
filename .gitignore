@@ -1,0 +1,35 @@
+# Python-generated residue
+__pycache__/
+build/
+dist/
+*.egg-info/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Local environments
+.venv/
+venv/
+
+# OS/editor residue
+.DS_Store
+*.swp
+*~
+
+# Local tooling state
+.gjc/
+.omx/
+
+# Local ledger and exports
+.papercuts/
+papercuts/
+!src/papercuts/
+events.jsonl
+events.lock
+papercuts.md

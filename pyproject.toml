@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "papercuts-cli"
+version = "0.0.0"
+description = "Local-first workflow friction ledger"
+readme = "README.md"
+license = {file = "LICENSE"}
+requires-python = ">=3.11"
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/cheong-yi/papercuts-cli"
+Repository = "https://github.com/cheong-yi/papercuts-cli"
+Issues = "https://github.com/cheong-yi/papercuts-cli/issues"
+
+[project.scripts]
+papercut = "papercuts.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.papercuts]
+standard-library-only = true

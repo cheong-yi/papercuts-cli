@@ -1,0 +1,2 @@
+include .gitignore PUBLIC_FILES.json
+prune tests
