@@ -17,7 +17,7 @@ Repository = "https://github.com/cheong-yi/papercuts-cli"
 Issues = "https://github.com/cheong-yi/papercuts-cli/issues"
 
 [project.scripts]
-papercut = "papercuts.cli:main"
+papercuts = "papercuts.cli:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}

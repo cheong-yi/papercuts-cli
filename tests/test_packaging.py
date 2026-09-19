@@ -80,7 +80,7 @@ class PackagingMetadataTests(unittest.TestCase):
         self.assertEqual(metadata["project"]["dependencies"], [])
         self.assertEqual(
             metadata["project"]["scripts"],
-            {"papercut": "papercuts.cli:main"},
+            {"papercuts": "papercuts.cli:main"},
         )
         self.assertEqual(
             metadata["tool"]["setuptools"]["package-dir"],
@@ -106,7 +106,7 @@ class PackagingMetadataTests(unittest.TestCase):
         self.assertIn("EXPECTED_COMMIT", readme)
         self.assertIn("sha256sum", readme)
         self.assertIn("--no-index --no-deps", normalized)
-        self.assertIn('"$INSTALL_ROOT/bin/papercut" --help', readme)
+        self.assertIn('"$INSTALL_ROOT/bin/papercuts" --help', readme)
         self.assertIn("not published to a package index", normalized)
         self.assertIn("does not download or resolve", normalized)
         self.assertIn("without changing a user or system `PATH`", normalized)
@@ -222,7 +222,7 @@ class BuiltDistributionTests(unittest.TestCase):
                 f"stderr:\n{completed.stderr}"
             )
 
-        cls.installed_command = cls.venv / "bin" / "papercut"
+        cls.installed_command = cls.venv / "bin" / "papercuts"
         completed = subprocess.run(
             [
                 sys.executable,
@@ -251,7 +251,9 @@ class BuiltDistributionTests(unittest.TestCase):
                 f"stderr:\n{completed.stderr}"
             )
         if not cls.installed_command.is_file():
-            raise AssertionError("wheel install did not generate bin/papercut")
+            raise AssertionError("wheel install did not generate bin/papercuts")
+        if (cls.venv / "bin" / "papercut").exists():
+            raise AssertionError("wheel install unexpectedly generated bin/papercut")
 
     @classmethod
     def _run_source(cls, cwd, *args):
@@ -335,7 +337,7 @@ class BuiltDistributionTests(unittest.TestCase):
         self.assertIsNone(metadata.get_all("Requires-Dist"))
         self.assertEqual(
             dict(entry_points["console_scripts"]),
-            {"papercut": "papercuts.cli:main"},
+            {"papercuts": "papercuts.cli:main"},
         )
         self.assertFalse(
             any(
@@ -406,7 +408,7 @@ class BuiltDistributionTests(unittest.TestCase):
         self.assertSameResult(source, installed)
         self.assertEqual(installed.returncode, 0, installed.stderr)
         self.assertEqual(installed.stderr, "")
-        self.assertIn("usage: papercut", installed.stdout)
+        self.assertIn("usage: papercuts", installed.stdout)
         for command in ("record", "resolve", "list", "render", "check", "packet"):
             with self.subTest(command=command):
                 self.assertIn(command, installed.stdout)
