@@ -9,10 +9,10 @@ Requires Python 3.11+, Git, and Linux on a local filesystem. From a reviewed che
 ```sh
 python3 -m venv .venv
 .venv/bin/python -m pip install .
-.venv/bin/papercut record --summary 'editor opens slowly'
-.venv/bin/papercut list
-.venv/bin/papercut resolve <id> --resolution 'disabled the slow extension'
-.venv/bin/papercut check
+.venv/bin/papercuts record --summary 'editor opens slowly'
+.venv/bin/papercuts list
+.venv/bin/papercuts resolve <id> --resolution 'disabled the slow extension'
+.venv/bin/papercuts check
 ```
 
 Replace `<id>` with the ID returned by `record`. Installation can download build tooling; it is not universally offline. Runtime uses only the Python standard library and Git, with no network or telemetry. To run without installing, use `PYTHONPATH=src python3 -B -m papercuts --help` from the checkout.
@@ -43,7 +43,7 @@ sha256sum "$WHEEL"
 env -u PYTHONPATH python3 -m venv --without-pip "$INSTALL_ROOT"
 env -u PYTHONPATH python3 -m pip --python "$INSTALL_ROOT/bin/python" install \
   --no-index --no-deps --disable-pip-version-check "$WHEEL"
-env -u PYTHONPATH "$INSTALL_ROOT/bin/papercut" --help
+env -u PYTHONPATH "$INSTALL_ROOT/bin/papercuts" --help
 ```
 
 Replace the example commit ID. This route requires locally available `setuptools>=61`, wheel, venv, and pip tooling; it does not download or resolve build dependencies. Retain the reviewed wheel and its SHA-256.
@@ -84,7 +84,7 @@ Uninstalling does not remove repository ledger data. This repository provides pa
 - `check`: validate the ledger without changing it.
 - `packet --expect-head OID|unborn [--record-id UUID4 ... | --event-id UUID4 ...]`: emit a canonical JSON evidence projection bound to the expected repository HEAD. Selectors are repeatable, unique, and limited to 25; selector types cannot be mixed.
 
-Run `papercut COMMAND --help` for accepted values. Only `record` and `resolve` write ledger events; the other commands are read-only. Rendering and packets are never saved automatically.
+Run `papercuts COMMAND --help` for accepted values. Only `record` and `resolve` write ledger events; the other commands are read-only. Rendering and packets are never saved automatically.
 
 ## Scope and limitations
 
@@ -116,7 +116,7 @@ Tests exercise storage safety, privacy boundaries, lifecycle commands, packets, 
 
 - `src/papercuts/`: CLI, event model, privacy validation, repository/storage safety, rendering, and packets.
 - `tests/` and `tests/fixtures/`: regression tests and synthetic fixtures.
-- `pyproject.toml`: package metadata and the `papercut` entry point.
+- `pyproject.toml`: package metadata and the `papercuts` entry point.
 - `MANIFEST.in`: includes the public inventory and `.gitignore` in source distributions; excludes tests and fixtures.
 - `.gitignore`: excludes local state and generated files.
 - `PUBLIC_FILES.json`: exact publication inventory and content hashes.

@@ -71,7 +71,7 @@ def _row_limit(value: str) -> int:
 
 
 def _parser() -> argparse.ArgumentParser:
-    parser = _ArgumentParser(prog="papercut")
+    parser = _ArgumentParser(prog="papercuts")
     commands = parser.add_subparsers(dest="command", required=True)
 
     record_parser = commands.add_parser("record")
