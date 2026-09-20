@@ -1,6 +1,6 @@
 # Papercuts CLI
 
-![An original folded-paper worker records, reviews, and resolves workflow friction through a local CLI ledger](docs/assets/readme/papercuts-ledger-hero.png)
+![A hand-drawn robot archivist reviews and resolves a friction note between the Papercuts terminal and a local ledger](docs/assets/readme/papercuts-ledger-hero.png)
 
 > A local-first, append-only ledger for small developer and AI-agent workflow friction.
 
