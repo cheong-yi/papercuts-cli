@@ -1,10 +1,14 @@
 # Papercuts CLI
 
-Record small, recoverable developer and AI-agent workflow friction without leaving your repository. Papercuts keeps a local, append-only ledger so you can capture an annoyance, review it, and record its resolution.
+![An original folded-paper worker records, reviews, and resolves workflow friction through a local CLI ledger](docs/assets/readme/papercuts-ledger-hero.png)
+
+> A local-first, append-only ledger for small developer and AI-agent workflow friction.
+
+Capture an observation, inspect it, and record a resolution without editing project files or granting authority.
 
 ## Quickstart
 
-Requires Python 3.11+, Git, and Linux on a local filesystem. From a reviewed checkout:
+Requires Python 3.11+, Git, and a local Linux filesystem. From a reviewed checkout:
 
 ```sh
 python3 -m venv .venv
@@ -15,7 +19,34 @@ python3 -m venv .venv
 .venv/bin/papercuts check
 ```
 
-Replace `<id>` with the ID returned by `record`. Installation can download build tooling; it is not universally offline. Runtime uses only the Python standard library and Git, with no network or telemetry. To run without installing, use `PYTHONPATH=src python3 -B -m papercuts --help` from the checkout.
+Replace `<id>` with the ID returned by `record`. Installation can download build tooling, so it is not universally offline. Runtime uses only the Python standard library and Git; it makes no network calls and sends no telemetry. To run from the checkout without installing:
+
+```sh
+PYTHONPATH=src python3 -B -m papercuts --help
+```
+
+## Commands and writes
+
+- `record --summary TEXT`: append a friction record. Optional `--category`, `--expected`, `--observed`, `--evidence-basis`, and `--recurrence-key` add context.
+- `resolve ID --resolution TEXT`: append one resolution for an existing record; a record can be resolved once.
+- `list [--status open|resolved|all] [--limit N]`: print records in first-recorded order; defaults to open records and 5 rows, with a maximum of 25.
+- `render [--status open|resolved|all]`: print deterministic, inert Markdown; it is never saved automatically.
+- `check`: validate the ledger without changing it.
+- `packet --expect-head OID|unborn [--record-id UUID4 ... | --event-id UUID4 ...]`: print canonical JSON bound to the expected repository HEAD. Selectors are repeatable, unique, limited to 25, and cannot be mixed.
+
+Run `papercuts COMMAND --help` for accepted values. Only `record` and `resolve` write ledger events; `list`, `render`, `check`, and `packet` are read-only.
+
+## Boundaries and safety
+
+A record is an observation, not a signature, approval, instruction, permission, or proof. A packet does not authorize action. Capture and resolution are manual: there are no hooks, daemons, automatic transcript collection, integrations, automatic fixes, or automatic enablement.
+
+Events are stored at `<git-common-dir>/papercuts/events.jsonl`; linked worktrees share one ledger. The storage directory and files are owner-only. Readers use shared locks and writers use exclusive locks. Unsafe storage, lock contention, or malformed history fail closed rather than repairing data.
+
+The ledger is bounded to 8 MiB, 10,000 events, and 8,192 bytes per event line. List output is bounded to 4,096 UTF-8 bytes. Papercuts is not a general-purpose log collector or issue tracker. Network filesystems and non-Linux platforms are unsupported.
+
+Before writing, Papercuts rejects selected home/drive/UNC paths, URI credentials, private-key headers, specific GitHub/OpenAI-style/AWS/Slack token shapes, and selected Unicode controls. This is a narrow pattern filter, **not general secret detection**; accepted text is not guaranteed safe to share.
+
+Paraphrase sensitive material. Arguments may appear in shell history or process listings; output may appear in terminal scrollback, redirected files, or logs. Review inputs and output destinations yourself. Ledger files are local runtime data, not publication material. `.gitignore` rules are a precaution, not a security boundary.
 
 ## Isolated installation
 
@@ -75,32 +106,7 @@ env -u PYTHONPATH python3 -m pip --python "$INSTALL_ROOT/bin/python" uninstall -
 
 Uninstalling does not remove repository ledger data. This repository provides package metadata and evaluation instructions, not evidence of package-index publication, live user or system installation or adoption, `PATH` or profile mutation, or automatic enablement.
 
-## Commands
-
-- `record --summary TEXT`: capture friction; optional `--category`, `--expected`, `--observed`, `--evidence-basis`, and `--recurrence-key` add context.
-- `resolve ID --resolution TEXT`: resolve a record once.
-- `list [--status open|resolved|all] [--limit N]`: show open records by default, with a default limit of 5 (maximum 25), in first-recorded order.
-- `render [--status open|resolved|all]`: emit deterministic, inert Markdown to stdout.
-- `check`: validate the ledger without changing it.
-- `packet --expect-head OID|unborn [--record-id UUID4 ... | --event-id UUID4 ...]`: emit a canonical JSON evidence projection bound to the expected repository HEAD. Selectors are repeatable, unique, and limited to 25; selector types cannot be mixed.
-
-Run `papercuts COMMAND --help` for accepted values. Only `record` and `resolve` write ledger events; the other commands are read-only. Rendering and packets are never saved automatically.
-
-## Scope and limitations
-
-Papercuts records observations, not authority. A packet is neither a signature nor an approval, and it does not authorize actions or prove that an observation is true. Capture and resolution are manual. There are no hooks, daemons, automatic transcript collection, integrations, or automatic fixes.
-
-Events live at `<git-common-dir>/papercuts/events.jsonl`. Linked worktrees share one ledger. Storage directories and files are owner-only; readers use shared locks and writers use exclusive locks. Unsafe storage, lock contention, and malformed history fail closed rather than being repaired automatically. Network filesystems and non-Linux platforms are unsupported.
-
-The ledger is bounded to 8 MiB, 10,000 events, and 8,192 bytes per event line. List output is bounded to 4,096 UTF-8 bytes. These limits are intentional; Papercuts is not a general-purpose log collector or issue tracker.
-
-## Privacy
-
-Before writing, Papercuts rejects selected home/drive/UNC paths, URI credentials, private-key headers, specific GitHub/OpenAI-style/AWS/Slack token shapes, and selected Unicode controls. This is a narrow pattern filter, **not general secret detection**. It cannot guarantee that accepted text is safe to share.
-
-Paraphrase sensitive material. Arguments may appear in shell history or process listings; output may appear in terminal scrollback, redirected files, or logs. Review inputs and output destinations yourself. Ledger files are local runtime data, not publication material. The ignore rules are a precaution, not a security boundary.
-
-## Verification
+## Verification and source
 
 Run the full test suite from the checkout:
 
@@ -108,19 +114,14 @@ Run the full test suite from the checkout:
 PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src python3 -B -m unittest discover -s tests -v
 ```
 
-Tests exercise storage safety, privacy boundaries, lifecycle commands, packets, rendering, concurrency, no-network behavior, and packaging. Packaging tests require locally available setuptools and wheel tooling. This repository does not provide CI configuration.
+Tests cover storage safety, privacy boundaries, lifecycle commands, packets, rendering, concurrency, no-network behavior, and packaging. This repository does not provide CI configuration.
 
-`PUBLIC_FILES.json` is the closed-world source inventory: its sorted `files` array includes the manifest itself and must equal every regular file in the checkout, excluding `.git`. Each other file has a SHA-256 in `sha256`; the manifest omits its own hash to avoid self-reference. Run validation in a clean checkout; generated artifacts belong outside the publication tree.
+[`PUBLIC_FILES.json`](PUBLIC_FILES.json) is the closed-world source inventory: its sorted `files` array must equal every regular public file in the checkout, excluding `.git`; every other file has a SHA-256 in `sha256`, while the manifest omits its own hash to avoid self-reference.
 
-## Public file map
-
-- `src/papercuts/`: CLI, event model, privacy validation, repository/storage safety, rendering, and packets.
-- `tests/` and `tests/fixtures/`: regression tests and synthetic fixtures.
-- `pyproject.toml`: package metadata and the `papercuts` entry point.
-- `MANIFEST.in`: includes the public inventory and `.gitignore` in source distributions; excludes tests and fixtures.
-- `.gitignore`: excludes local state and generated files.
-- `PUBLIC_FILES.json`: exact publication inventory and content hashes.
-- `README.md` and `LICENSE`: public guidance and license.
+- [`src/papercuts/cli.py`](src/papercuts/cli.py) — command surface and output behavior.
+- [`src/papercuts/privacy.py`](src/papercuts/privacy.py) — caller-input privacy filter.
+- [`src/papercuts/repo.py`](src/papercuts/repo.py) — Git identity, locks, and storage safety.
+- [`tests/`](tests/) — regression and packaging coverage.
 
 ## Attribution
 
